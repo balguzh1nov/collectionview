@@ -1,0 +1,90 @@
+import UIKit
+
+class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+    private var collectionView: UICollectionView!
+
+    private let cellSize = CGSize(width: 191, height: 151)
+    private let cellIdentifier = "Cell"
+
+    
+    private let images: [UIImage] = [
+        UIImage(named: "image")!,
+        UIImage(named: "image")!,
+        UIImage(named: "image")!,
+        UIImage(named: "image")!,
+        UIImage(named: "image")!
+    ]
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // Set up the collection view layout
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = cellSize
+        layout.minimumInteritemSpacing = 20
+        layout.minimumLineSpacing = 60
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+
+        // Calculate the available width for the collection view
+        let availableWidth = view.bounds.width - layout.sectionInset.left - layout.sectionInset.right
+
+        // Calculate the width for each cell in a two-column layout
+        let cellWidth = (availableWidth - layout.minimumInteritemSpacing) / 2
+        layout.itemSize = CGSize(width: cellWidth, height: cellSize.height)
+
+        // Create the collection view
+        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
+        collectionView.backgroundColor = .white
+
+        view.addSubview(collectionView)
+        
+        collectionView.register(CollectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "Header")
+
+    }
+
+    // MARK: - UICollectionViewDataSource methods
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        // Return the number of items you want to display
+        return images.count
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! CollectionViewCell
+
+        // Configure the cell with your data
+        cell.imageView.image = images[indexPath.item]
+
+        return cell
+    }
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionView.elementKindSectionHeader {
+            let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as! CollectionHeaderView
+            headerView.titleLabel.text = "Section \(indexPath.section + 1)"
+            return headerView
+        }
+        // Return a default UICollectionReusableView if needed
+        return UICollectionReusableView()
+    }
+
+}
+
+extension ViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        // Return the desired size for the header view
+        return CGSize(width: collectionView.bounds.width, height: 50)
+    }
+    
+    // Optionally, you can also implement the following method to provide the inset for the header view if needed
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+    }
+    
+    // Optionally, you can also implement the following method to provide the minimum line spacing for the header view if needed
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 10
+    }
+}
